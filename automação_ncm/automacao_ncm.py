@@ -7,13 +7,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
+import funcoes
 
 
 ## manipulação de dados 
     #lendo o arquivo csv
 df = pd.read_csv("dados.csv")
 
-    # tratando o arquivo csv
+  # tratando o arquivo csv
 df_novo = df[["Código", "Descrição", "NCM_Correto"]]
 
 
@@ -25,27 +26,19 @@ df_novo.loc[:, "NCM_Correto"] = df_novo["NCM_Correto"].str.replace(".", "", rege
     # abrir navegador
 navegador = webdriver.Chrome()
 
+espera10 = WebDriverWait(navegador, 10)
+espera = WebDriverWait(navegador, 30)
+
     # colocar navergador em tela cheia
 navegador.maximize_window()
 
     # abrir site na tela de login
 navegador.get("https://zweb.com.br/#/sign-in")
 
-    # selecionar elementos e passar os dados para login 
-        #email
-navegador.find_element("class name", "form-control").send_keys("")
+    #digitando email e senha
+funcoes.login(navegador, (input("qual é o email: ")), (input("qual a senha:")))
 
-        #senha
-navegador.find_element("xpath", "/html/body/div[1]/div/div/div/div/div/div[2]/div[2]/div[2]/div/div/input").send_keys("")
-
-button_entrar = navegador.find_element("xpath", "/html/body/div[1]/div/div/div/div/div/div[2]/div[2]/div[4]/button")
-
-    # clicar no botao entrar
-button_entrar.click()
-
-
-espera10 = WebDriverWait(navegador, 10)
-espera = WebDriverWait(navegador, 30)
+    #esperando a exixtencia de um elemento para continuar o código
 espera.until(EC.presence_of_element_located(("xpath", "/html/body/div[1]/div[1]/div/div[1]/div[1]/div/div[2]/div[1]/div/div[2]/a/span/span")))
 
 ## operação de cadastramento dos itens 
@@ -96,9 +89,11 @@ for index, row in df_novo.iterrows():
         navegador.find_element("id", "product.fiscal.produto.NCM-0").click()
 
     except TimeoutException:
-        # elemento não existe → ignora o click
+        # elemento não existe > ignora o click
         pass
 
+    else:
+        print
         # salva 
     navegador.find_element("xpath", "/html/body/div[1]/div[1]/div/div[2]/div/div/div/div/div[2]/footer/div/div/button[4]").click()
 
